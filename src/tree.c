@@ -1,24 +1,18 @@
+#include <stdlib.h>
+#include <string.h>
+#include <ncurses.h>
 #include "tree.h"
 
-static int max(int a, int b);
-
-static int max(int a, int b)
+void
+t_get_codes (struct node * root, struct c_block * c_bl, int index, int h)
 {
-    if (a > b)
-        return a;
-    else
-        return b;
-}
-
-void t_get_codes(struct node *root, struct c_block *c_bl, int index, int h)
-{
-    if (root->left != NULL) {
+    if (root->left) {
         c_bl->bytes[index] = '0';
 
         t_get_codes(root->left, c_bl, index + 1, h);
     }
 
-    if (root->right != NULL) {
+    if (root->right) {
         c_bl->bytes[index] = '1';
 
         t_get_codes(root->right, c_bl, index + 1, h);
@@ -33,43 +27,45 @@ void t_get_codes(struct node *root, struct c_block *c_bl, int index, int h)
          *          /  \
          *         c    d <- let's say, we are here
          *
-         * 'd' has code 111. I.e., c_bl->bytes = "111".
+         * 'd' has code 111. I. e., c_bl->bytes = "111".
          *
          * root->data.s[0] is 'd';
          * root->data.f is frequency of 'd'.
          *
-         * Append it into the c_bl->c_l, including 'd' code. */
-        struct c_data *data = malloc(sizeof(struct c_data));
+         * Append it into the c_bl->c_l, including the 'd' code. */
+        struct c_data * data = malloc(sizeof(struct c_data));
 
         data->c = root->data.s[0];
         data->f = root->data.f;
         data->code = calloc(index + 1, sizeof(char));
         strncpy(data->code, c_bl->bytes, index);
 
-        c_l_append(c_bl->c_l, data, index);
+        c_l_append(c_bl->c_l, data);
 
         free(data->code);
         free(data);
     }
 }
 
-int t_get_height(struct node *root)
+int
+t_get_height (struct node * root)
 {
     int h_l;
     int h_r;
 
-    if (root == NULL)
+    if (!root)
         return 0;
 
     h_l = t_get_height(root->left);
     h_r = t_get_height(root->right);
 
-    return max(h_l, h_r) + 1;
+    return h_l > h_r ? h_l + 1 : h_r + 1;
 }
 
-void t_free(struct node *root)
+void
+t_free (struct node * root)
 {
-    if (root == NULL)
+    if (!root)
         return;
 
     t_free(root->left);
@@ -78,7 +74,8 @@ void t_free(struct node *root)
     n_free(root);
 }
 
-void t_print(struct node *n, int y, int x, bool codes)
+void
+t_print (struct node * n, int y, int x, bool codes)
 {
     int x_left = x;
     int x_right = x;
@@ -86,7 +83,7 @@ void t_print(struct node *n, int y, int x, bool codes)
     move(y, x);
     printw("%s", n->data.s);
 
-    if (n->left != NULL) {
+    if (n->left) {
         move(++y, --x_left);
         addch('/');
 
@@ -94,7 +91,7 @@ void t_print(struct node *n, int y, int x, bool codes)
             mvaddch(y, x_left - 1, '0');
     }
 
-    if (n->right != NULL) {
+    if (n->right) {
         x_right += strlen(n->data.s);
 
         move(y, x_right);
@@ -105,9 +102,9 @@ void t_print(struct node *n, int y, int x, bool codes)
             mvaddch(y, x_right + 1, '1');
     }
 
-    if (n->left != NULL)
+    if (n->left)
         t_print(n->left, ++y, x_left -= strlen(n->left->data.s), codes);
 
-    if (n->right != NULL)
+    if (n->right)
         t_print(n->right, y, ++x_right, codes);
 }

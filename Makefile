@@ -1,18 +1,31 @@
-CC=gcc
+CC = gcc
+CFLAGS = -Wall -Iinclude
+LDFLAGS = -lncurses
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+BINDIR = bin
+BIN = $(BINDIR)/prog
 
-CFLAGS=-Wall -g
-LDFLAGS=-g -lncurses
+SRCS = $(shell find $(SRCDIR) -name '*.c')
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+DIRS = $(sort $(dir $(OBJS)))
 
-OBJS=main.o node.c code.c tree.c
+.PHONY: all
+all: $(DIRS) $(BINDIR) $(BIN)
 
-PROGNAME=prog
+$(BIN): $(OBJS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-all: $(OBJS)
-	$(CC) $(LDFLAGS) -o $(PROGNAME) $^
+$(BINDIR):
+	@[ -d $@ ] || mkdir $@
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(DIRS):
+	@[ -d $@ ] || mkdir $@
 
 .PHONY: clean
 clean:
-	rm -f *.o $(PROGNAME)
+	rm -rf $(OBJDIR) $(BINDIR)

@@ -1,8 +1,12 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "node.h"
 
-struct node * n_alloc(char *s, int f)
+struct node *
+n_alloc (char * s, int f)
 {
-    struct node *n = malloc(sizeof(struct node));
+    struct node * n = malloc(sizeof(struct node));
 
     n->data.s = calloc(sizeof(char), strlen(s) + 1);
     strcpy(n->data.s, s);
@@ -13,28 +17,33 @@ struct node * n_alloc(char *s, int f)
     return n;
 }
 
-void n_add_left(struct node *root, struct node *n)
+void
+n_add_left (struct node * root, struct node * n)
 {
     root->left = n;
 }
 
-void n_add_right(struct node *root, struct node *n)
+void
+n_add_right (struct node * root, struct node * n)
 {
     root->right = n;
 }
 
-void n_free(struct node *n)
+void
+n_free (struct node * n)
 {
     free(n->data.s);
     free(n);
 }
 
-void n_print(struct node *n)
+void
+n_print(struct node * n)
 {
     printf("%s - %d\n", n->data.s, n->data.f);
 }
 
-void n_sort(struct node **n, unsigned int len)
+void
+n_sort (struct node ** n, unsigned int len)
 {
     bool sorted;
     unsigned int l = len;
@@ -59,12 +68,13 @@ void n_sort(struct node **n, unsigned int len)
     } while (!sorted);
 }
 
-struct node * n_merge(struct node *n1, struct node *n2)
+struct node *
+n_merge (struct node * n1, struct node * n2)
 {
-    struct node *root;
+    struct node * root;
 
-    char *s = calloc(sizeof(char), strlen(n1->data.s) +
-        strlen(n2->data.s) + 1);
+    char * s = calloc(sizeof(char),
+        strlen(n1->data.s) + strlen(n2->data.s) + 1);
 
     strcat(s, n1->data.s);
     strcat(s, n2->data.s);
@@ -78,10 +88,11 @@ struct node * n_merge(struct node *n1, struct node *n2)
     return root;
 }
 
-void n_shift(struct node **n, int pos, unsigned int len)
+void
+n_shift (struct node ** n, int pos, unsigned int len)
 {
     unsigned int i;
-    struct node *buff = n[pos];
+    struct node * buff = n[pos];
 
     for (i = pos; i < len - 1; i++)
         n[i] = n[i + 1];
@@ -89,12 +100,14 @@ void n_shift(struct node **n, int pos, unsigned int len)
     n[len - 1] = buff;
 }
 
-bool n_is_leaf(struct node *n)
+bool
+n_is_leaf (struct node * n)
 {
     return !n->left && !n->right;
 }
 
-void n_set(struct node *n, char *s, int f)
+void
+n_set (struct node * n, char * s, int f)
 {
     n->data.s = realloc(n->data.s, sizeof(char) * (strlen(s) + 1));
     strcpy(n->data.s, s);
